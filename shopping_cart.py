@@ -21,6 +21,12 @@ class ShoppingCart:
         else:
             self.items[product.id] = {'product': product, 'quantity': quantity}
 
+    def add_multiple_items(self, products_and_quantities):
+        if not products_and_quantities:
+            raise ValueError("Products list cannot be empty")
+        for product, quantity in products_and_quantities:
+            self.add_item(product, quantity)
+
     def remove_item(self, product_id, quantity):
         if product_id not in self.items:
             raise KeyError("Product not found in cart")

@@ -84,7 +84,40 @@ class TestShoppingCart(unittest.TestCase):
         with self.assertRaises(ValueError):
             cart.add_item(product, invalid_quantity)
 
-    def test_09_remove_partial_quantity_from_cart(self):
+    def test_09_add_multiple_different_items_at_once(self):
+        cart = ShoppingCart()
+        product1 = Product(1, "Laptop", 999.99)
+        product2 = Product(2, "Mouse", 25.50)
+        product3 = Product(3, "Keyboard", 75.00)
+        items_list = [(product1, 2), (product2, 1), (product3, 3)]
+
+        cart.add_multiple_items(items_list)
+
+        self.assertEqual(len(cart.items), 3)
+        self.assertEqual(cart.items[1]['quantity'], 2)
+        self.assertEqual(cart.items[2]['quantity'], 1)
+        self.assertEqual(cart.items[3]['quantity'], 3)
+
+    def test_10_add_multiple_items_with_duplicates(self):
+        cart = ShoppingCart()
+        product1 = Product(1, "Laptop", 999.99)
+        product2 = Product(2, "Mouse", 25.50)
+        items_list = [(product1, 2), (product2, 1), (product1, 3)]
+
+        cart.add_multiple_items(items_list)
+
+        self.assertEqual(len(cart.items), 2)
+        self.assertEqual(cart.items[1]['quantity'], 5)
+        self.assertEqual(cart.items[2]['quantity'], 1)
+
+    def test_11_add_multiple_items_empty_list_raises_exception(self):
+        cart = ShoppingCart()
+        empty_list = []
+
+        with self.assertRaises(ValueError):
+            cart.add_multiple_items(empty_list)
+
+    def test_12_remove_partial_quantity_from_cart(self):
         cart = ShoppingCart()
         product = Product(1, "Laptop", 999.99)
         cart.add_item(product, 5)
@@ -93,7 +126,7 @@ class TestShoppingCart(unittest.TestCase):
 
         self.assertEqual(cart.items[1]['quantity'], 3)
 
-    def test_10_remove_all_quantity_removes_item_completely(self):
+    def test_13_remove_all_quantity_removes_item_completely(self):
         cart = ShoppingCart()
         product = Product(1, "Laptop", 999.99)
         cart.add_item(product, 3)
@@ -103,13 +136,13 @@ class TestShoppingCart(unittest.TestCase):
         self.assertNotIn(1, cart.items)
         self.assertEqual(len(cart.items), 0)
 
-    def test_11_remove_nonexistent_item_raises_exception(self):
+    def test_14_remove_nonexistent_item_raises_exception(self):
         cart = ShoppingCart()
 
         with self.assertRaises(KeyError):
             cart.remove_item(999, 1)
 
-    def test_12_remove_more_than_available_raises_exception(self):
+    def test_15_remove_more_than_available_raises_exception(self):
         cart = ShoppingCart()
         product = Product(1, "Laptop", 999.99)
         cart.add_item(product, 2)
@@ -117,7 +150,7 @@ class TestShoppingCart(unittest.TestCase):
         with self.assertRaises(ValueError):
             cart.remove_item(1, 5)
 
-    def test_13_update_item_quantity_changes_amount(self):
+    def test_16_update_item_quantity_changes_amount(self):
         cart = ShoppingCart()
         product = Product(1, "Laptop", 999.99)
         cart.add_item(product, 2)
@@ -127,7 +160,7 @@ class TestShoppingCart(unittest.TestCase):
 
         self.assertEqual(cart.items[1]['quantity'], new_quantity)
 
-    def test_14_clear_cart_removes_all_items(self):
+    def test_17_clear_cart_removes_all_items(self):
         cart = ShoppingCart()
         product1 = Product(1, "Laptop", 999.99)
         product2 = Product(2, "Mouse", 25.50)
@@ -138,14 +171,14 @@ class TestShoppingCart(unittest.TestCase):
 
         self.assertEqual(len(cart.items), 0)
 
-    def test_15_calculate_total_for_empty_cart(self):
+    def test_18_calculate_total_for_empty_cart(self):
         cart = ShoppingCart()
 
         total = cart.get_total_price()
 
         self.assertEqual(total, 0.00)
 
-    def test_16_calculate_total_for_single_item(self):
+    def test_19_calculate_total_for_single_item(self):
         cart = ShoppingCart()
         product = Product(1, "Laptop", 999.99)
         cart.add_item(product, 2)
@@ -154,7 +187,7 @@ class TestShoppingCart(unittest.TestCase):
 
         self.assertEqual(total, 1999.98)
 
-    def test_17_calculate_total_for_multiple_items(self):
+    def test_20_calculate_total_for_multiple_items(self):
         cart = ShoppingCart()
         product1 = Product(1, "Laptop", 999.99)
         product2 = Product(2, "Mouse", 25.50)
@@ -165,22 +198,34 @@ class TestShoppingCart(unittest.TestCase):
 
         self.assertEqual(total, 1050.99)
 
+    def test_21_calculate_total_for_multiple_items_added_at_once(self):
+        cart = ShoppingCart()
+        product1 = Product(1, "Laptop", 999.99)
+        product2 = Product(2, "Mouse", 25.50)
+        product3 = Product(3, "Keyboard", 75.00)
+        items_list = [(product1, 1), (product2, 2), (product3, 1)]
+
+        cart.add_multiple_items(items_list)
+        total = cart.get_total_price()
+
+        self.assertEqual(total, 1125.99)
+
 class TestServiceFunctions(unittest.TestCase):
 
-    def test_18_validate_positive_quantity_returns_true(self):
+    def test_22_validate_positive_quantity_returns_true(self):
         valid_quantity = 5
 
         result = validate_quantity(valid_quantity)
 
         self.assertTrue(result)
 
-    def test_19_validate_zero_quantity_raises_exception(self):
+    def test_23_validate_zero_quantity_raises_exception(self):
         invalid_quantity = 0
 
         with self.assertRaises(ValueError):
             validate_quantity(invalid_quantity)
 
-    def test_20_calculate_item_subtotal_correct_amount(self):
+    def test_24_calculate_item_subtotal_correct_amount(self):
         product = Product(1, "Test Product", 50.00)
         quantity = 3
 
