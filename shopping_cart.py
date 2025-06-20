@@ -1,44 +1,53 @@
-class InvalidQuantityError(Exception):
-    """Exception raised when quantity is invalid"""
-    pass
+class Product:
+    def __init__(self, id, name, price):
+        if price < 0:
+            raise ValueError("Price cannot be negative")
+        self.id = id
+        self.name = name
+        self.price = price
 
-class ProductNotFoundError(Exception):
-    """Exception raised when product is not found in cart"""
-    pass
+    def __repr__(self):
+        return f"Product(id={self.id}, name='{self.name}', price={self.price})"
 
 class ShoppingCart:
     def __init__(self):
-        self.items = {}  # key: product id, value: dict with product and quantity
+        self.items = {}
 
     def add_item(self, product, quantity):
         if quantity <= 0:
-            raise InvalidQuantityError("Quantity must be greater than zero")
+            raise ValueError("Quantity must be greater than zero")
         if product.id in self.items:
             self.items[product.id]['quantity'] += quantity
         else:
             self.items[product.id] = {'product': product, 'quantity': quantity}
 
+    def add_multiple_items(self, products_and_quantities):
+        if not products_and_quantities:
+            raise ValueError("Products list cannot be empty")
+        for product, quantity in products_and_quantities:
+            self.add_item(product, quantity)
+
     def remove_item(self, product_id, quantity):
         if product_id not in self.items:
-            raise ProductNotFoundError("Product not found in cart")
+            raise KeyError("Product not found in cart")
         if quantity <= 0:
-            raise InvalidQuantityError("Quantity must be greater than zero")
+            raise ValueError("Quantity must be greater than zero")
         if quantity > self.items[product_id]['quantity']:
-            raise InvalidQuantityError("Cannot remove more than existing quantity")
+            raise ValueError("Cannot remove more than existing quantity")
         self.items[product_id]['quantity'] -= quantity
         if self.items[product_id]['quantity'] == 0:
             del self.items[product_id]
 
     def remove_all_items(self, product_id):
         if product_id not in self.items:
-            raise ProductNotFoundError("Product not found in cart")
+            raise KeyError("Product not found in cart")
         del self.items[product_id]
 
     def update_quantity(self, product_id, new_quantity):
         if product_id not in self.items:
-            raise ProductNotFoundError("Product not found in cart")
+            raise KeyError("Product not found in cart")
         if new_quantity <= 0:
-            raise InvalidQuantityError("Quantity must be greater than zero")
+            raise ValueError("Quantity must be greater than zero")
         self.items[product_id]['quantity'] = new_quantity
 
     def get_total_price(self):
@@ -61,5 +70,20 @@ class ShoppingCart:
             'quantity': item['quantity']
         } for item in self.items.values()]
 
-    def __repr__(self):
-        return f"ShoppingCart(items={self.items})"
+def validate_quantity(quantity):
+    if quantity <= 0:
+        raise ValueError("Quantity must be greater than zero")
+    return True
+
+def validate_price(price):
+    if price < 0:
+        raise ValueError("Price cannot be negative")
+    return True
+
+def calculate_item_subtotal(product, quantity):
+    if quantity <= 0:
+        raise ValueError("Quantity must be greater than zero")
+    return round(product.price * quantity, 2)
+
+def format_price(price):
+    return round(price, 2)
